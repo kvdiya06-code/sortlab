@@ -94,6 +94,7 @@ function genScenario(type) {
 
 function setCustomData() {
     const val = document.getElementById('customInput').value;
+    if (!val) return;
     const arr = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
     if (arr.length > 1) { masterArr = arr; currentN = arr.length; resetBenchmark(); }
 }
@@ -102,7 +103,6 @@ function togglePause() {
     isPlaying = !isPlaying;
     const btn = document.getElementById('pauseBtn');
     btn.innerText = isPlaying ? "Pause" : "Resume";
-    btn.style.color = isPlaying ? "var(--accent)" : "var(--done)";
     if (isPlaying) loop();
 }
 
@@ -179,17 +179,17 @@ function showAnalysis() {
     const winner = ranked[0];
     const details = document.getElementById('comparisonDetails');
     document.getElementById('comparisonOverlay').style.display = 'flex';
-    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Efficiency</th></tr>`;
+    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Gap</th></tr>`;
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
-        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? '🏆 BEST' : gap + 'x slower'}</td></tr>`;
+        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? '🏆 WINNER' : gap + 'x slower'}</td></tr>`;
     });
     html += `</table>`;
     details.innerHTML = html;
 }
 
 function setN(n) { currentN = n; genScenario('avg'); }
-document.getElementById('playBtn').onclick = () => { isPlaying = true; document.getElementById('pauseBtn').innerText = "Pause"; loop(); };
+document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); };
 document.getElementById('resetBtn').onclick = () => genScenario('avg');
 document.querySelectorAll('.checklist input').forEach(i => i.onchange = () => resetBenchmark());
 genScenario('avg');
