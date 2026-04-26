@@ -179,12 +179,22 @@ function showAnalysis() {
     const winner = ranked[0];
     const details = document.getElementById('comparisonDetails');
     document.getElementById('comparisonOverlay').style.display = 'flex';
-    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Gap</th></tr>`;
+
+    // We removed the trophy and changed "WINNER" to "Fastest" or simply "1.0x"
+    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
-        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? '🏆 WINNER' : gap + 'x slower'}</td></tr>`;
+        html += `<tr class="${a === winner ? 'row-winner' : ''}">
+                    <td>${a.toUpperCase()}</td>
+                    <td>${engines[a].frames.length}</td>
+                    <td>${a === winner ? 'Optimal' : gap + 'x'}</td>
+                 </tr>`;
     });
     html += `</table>`;
+    
+    // Updated insight text to be more clinical
+    html += `<div class="insight-text"><b>Analysis:</b> ${winner.toUpperCase()} achieved the target state with the lowest computational overhead in this scenario.</div>`;
+    
     details.innerHTML = html;
 }
 
