@@ -169,3 +169,44 @@ document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); }
 document.getElementById('resetBtn').onclick = () => genScenario('avg');
 document.querySelectorAll('.checklist input').forEach(i => i.onchange = () => resetBenchmark());
 genScenario('avg');
+function togglePause() {
+    isPlaying = !isPlaying;
+    document.getElementById('pauseBtn').innerText = isPlaying ? "Pause" : "Resume";
+    if (isPlaying) loop(); // Restart the loop if we resumed
+}
+
+function stepForward() {
+    if (isPlaying) isPlaying = false; // Pause if it was running
+    document.getElementById('pauseBtn').innerText = "Resume";
+    
+    let moved = false;
+    Object.keys(engines).forEach(a => {
+        if (engines[a].idx < engines[a].frames.length - 1) {
+            engines[a].idx++;
+            render(a, engines[a].idx);
+            moved = true;
+        }
+    });
+    return moved;
+}
+
+function stepBack() {
+    if (isPlaying) isPlaying = false;
+    document.getElementById('pauseBtn').innerText = "Resume";
+
+    Object.keys(engines).forEach(a => {
+        if (engines[a].idx > 0) {
+            engines[a].idx--;
+            render(a, engines[a].idx);
+        }
+    });
+}
+
+// Small tweak to your existing playBtn:
+document.getElementById('playBtn').onclick = () => { 
+    if(!isPlaying) {
+        isPlaying = true; 
+        document.getElementById('pauseBtn').innerText = "Pause";
+        loop(); 
+    }
+};
