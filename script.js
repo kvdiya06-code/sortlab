@@ -83,11 +83,21 @@ const Algos = {
 
 function genScenario(type) {
     document.querySelectorAll('.scen-btn').forEach(b => b.classList.remove('active'));
-    if(event) event.target.classList.add('active');
+    if(event && event.target) event.target.classList.add('active');
+    
+    // Ensure currentN never exceeds 85
+    if (currentN > 85) currentN = 85; 
+
     let arr = [];
-    if (type === 'best') arr = Array.from({length: currentN}, (_, i) => i + 5);
-    else if (type === 'worst') arr = Array.from({length: currentN}, (_, i) => (currentN - i) + 5);
-    else arr = Array.from({length: currentN}, () => Math.floor(Math.random() * 100) + 5);
+    if (type === 'best') {
+        arr = Array.from({length: currentN}, (_, i) => i + 5);
+    } else if (type === 'worst') {
+        arr = Array.from({length: currentN}, (_, i) => (currentN - i) + 5);
+    } else {
+        // Updated random logic to scale with the 85 limit
+        arr = Array.from({length: currentN}, () => Math.floor(Math.random() * 90) + 5);
+    }
+    
     masterArr = arr;
     resetBenchmark();
 }
