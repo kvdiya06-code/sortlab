@@ -70,9 +70,9 @@ const Algos = {
             let i = 0, j = 0, k = start;
             while (i < left.length && j < right.length) {
                 stats.ops++;
-                if (left[i] <= right[j]) arr[k++] = left[i++];
-                else arr[k++] = right[j++];
-                stats.swaps++; push([k], [k]);
+                if (left[i] <= right[j]) arr[k] = left[i++];
+                else arr[k] = right[j++];
+                stats.swaps++; push([k], [k]); k++;
             }
             while (i < left.length) arr[k++] = left[i++];
             while (j < right.length) arr[k++] = right[j++];
@@ -98,9 +98,34 @@ function setCustomData() {
     if (arr.length > 1) { masterArr = arr; currentN = arr.length; resetBenchmark(); }
 }
 
+function togglePause() {
+    isPlaying = !isPlaying;
+    const btn = document.getElementById('pauseBtn');
+    btn.innerText = isPlaying ? "Pause" : "Resume";
+    btn.style.color = isPlaying ? "var(--accent)" : "var(--done)";
+    if (isPlaying) loop();
+}
+
+function stepForward() {
+    isPlaying = false;
+    document.getElementById('pauseBtn').innerText = "Resume";
+    Object.keys(engines).forEach(a => {
+        if (engines[a].idx < engines[a].frames.length - 1) { engines[a].idx++; render(a, engines[a].idx); }
+    });
+}
+
+function stepBack() {
+    isPlaying = false;
+    document.getElementById('pauseBtn').innerText = "Resume";
+    Object.keys(engines).forEach(a => {
+        if (engines[a].idx > 0) { engines[a].idx--; render(a, engines[a].idx); }
+    });
+}
+
 function resetBenchmark() {
     isPlaying = false; clearTimeout(clock);
     document.getElementById('comparisonOverlay').style.display = 'none';
+    document.getElementById('pauseBtn').innerText = "Pause";
     const grid = document.getElementById('matrixGrid');
     const selected = Array.from(document.querySelectorAll('.checklist input:checked')).map(i => i.value);
     grid.innerHTML = ''; engines = {};
@@ -154,59 +179,17 @@ function showAnalysis() {
     const winner = ranked[0];
     const details = document.getElementById('comparisonDetails');
     document.getElementById('comparisonOverlay').style.display = 'flex';
-    
-    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Gap</th></tr>`;
+    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Efficiency</th></tr>`;
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
-        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? 'WINNER' : gap + 'x slower'}</td></tr>`;
+        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? '🏆 BEST' : gap + 'x slower'}</td></tr>`;
     });
-    html += `</table><div class="insight-text"><b>Why ${winner.toUpperCase()} won:</b> ${winner === 'quick' || winner === 'merge' ? 'It uses Divide & Conquer logic ($O(n \log n)$), which reduces the number of comparisons significantly compared to $O(n^2)$ algorithms.' : 'It was highly adaptive to this specific data sequence.'}</div>`;
+    html += `</table>`;
     details.innerHTML = html;
 }
 
 function setN(n) { currentN = n; genScenario('avg'); }
-document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); };
+document.getElementById('playBtn').onclick = () => { isPlaying = true; document.getElementById('pauseBtn').innerText = "Pause"; loop(); };
 document.getElementById('resetBtn').onclick = () => genScenario('avg');
 document.querySelectorAll('.checklist input').forEach(i => i.onchange = () => resetBenchmark());
 genScenario('avg');
-function togglePause() {
-    isPlaying = !isPlaying;
-    document.getElementById('pauseBtn').innerText = isPlaying ? "Pause" : "Resume";
-    if (isPlaying) loop(); // Restart the loop if we resumed
-}
-
-function stepForward() {
-    if (isPlaying) isPlaying = false; // Pause if it was running
-    document.getElementById('pauseBtn').innerText = "Resume";
-    
-    let moved = false;
-    Object.keys(engines).forEach(a => {
-        if (engines[a].idx < engines[a].frames.length - 1) {
-            engines[a].idx++;
-            render(a, engines[a].idx);
-            moved = true;
-        }
-    });
-    return moved;
-}
-
-function stepBack() {
-    if (isPlaying) isPlaying = false;
-    document.getElementById('pauseBtn').innerText = "Resume";
-
-    Object.keys(engines).forEach(a => {
-        if (engines[a].idx > 0) {
-            engines[a].idx--;
-            render(a, engines[a].idx);
-        }
-    });
-}
-
-// Small tweak to your existing playBtn:
-document.getElementById('playBtn').onclick = () => { 
-    if(!isPlaying) {
-        isPlaying = true; 
-        document.getElementById('pauseBtn').innerText = "Pause";
-        loop(); 
-    }
-};
