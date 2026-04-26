@@ -5,11 +5,11 @@ let clock = null;
 let currentN = 50;
 
 const Metadata = {
-    quick: { t: 'O(n log n)', worst: 'O(n²)' },
-    merge: { t: 'O(n log n)', worst: 'O(n log n)' },
-    insertion: { t: 'O(n²)', worst: 'O(n²)' },
-    selection: { t: 'O(n²)', worst: 'O(n²)' },
-    bubble: { t: 'O(n²)', worst: 'O(n²)' }
+    quick: { t: 'O(n log n)' },
+    merge: { t: 'O(n log n)' },
+    insertion: { t: 'O(n²)' },
+    selection: { t: 'O(n²)' },
+    bubble: { t: 'O(n²)' }
 };
 
 const Algos = {
@@ -107,7 +107,6 @@ function togglePause() {
 
 function stepForward() {
     isPlaying = false;
-    document.getElementById('pauseBtn').innerText = "Resume";
     Object.keys(engines).forEach(a => {
         if (engines[a].idx < engines[a].frames.length - 1) { engines[a].idx++; render(a, engines[a].idx); }
     });
@@ -115,7 +114,6 @@ function stepForward() {
 
 function stepBack() {
     isPlaying = false;
-    document.getElementById('pauseBtn').innerText = "Resume";
     Object.keys(engines).forEach(a => {
         if (engines[a].idx > 0) { engines[a].idx--; render(a, engines[a].idx); }
     });
@@ -157,24 +155,17 @@ function render(algo, fIdx) {
     const f = engines[algo].frames[fIdx];
     const box = document.getElementById(`viz-${algo}`);
     if (!box) return;
-    
     const max = Math.max(...masterArr);
     box.innerHTML = '';
-
     f.data.forEach((v, i) => {
-        const b = document.createElement('div');
-        b.className = 'bar';
-        b.style.height = `${(v / max) * 100}%`;
+        const b = document.createElement('div'); b.className = 'bar'; b.style.height = `${(v / max) * 100}%`;
         if (f.swap.includes(i)) b.style.backgroundColor = 'var(--swap)';
         else if (f.comp.includes(i)) b.style.backgroundColor = 'var(--compare)';
         else if (f.done.includes(i)) b.style.backgroundColor = 'var(--done)';
         box.appendChild(b);
     });
-    
-    const ops = document.getElementById(`ops-${algo}`);
-    const swp = document.getElementById(`swaps-${algo}`);
-    if(ops) ops.innerText = f.stats.ops;
-    if(swp) swp.innerText = f.stats.swaps;
+    document.getElementById(`ops-${algo}`).innerText = f.stats.ops;
+    document.getElementById(`swaps-${algo}`).innerText = f.stats.swaps;
 }
 
 function loop() {
@@ -191,15 +182,13 @@ function loop() {
 function showAnalysis() {
     const ranked = Object.keys(engines).sort((a, b) => engines[a].frames.length - engines[b].frames.length);
     const winner = ranked[0];
-    const details = document.getElementById('comparisonDetails');
     document.getElementById('comparisonOverlay').style.display = 'flex';
     let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
         html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? 'Optimal' : gap + 'x'}</td></tr>`;
     });
-    html += `</table>`;
-    details.innerHTML = html;
+    document.getElementById('comparisonDetails').innerHTML = html + `</table>`;
 }
 
 function setN(n) { currentN = n; genScenario('avg'); }
