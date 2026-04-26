@@ -178,26 +178,37 @@ function showAnalysis() {
     const ranked = Object.keys(engines).sort((a, b) => engines[a].frames.length - engines[b].frames.length);
     const winner = ranked[0];
     const details = document.getElementById('comparisonDetails');
+    
     document.getElementById('comparisonOverlay').style.display = 'flex';
 
-    // We removed the trophy and changed "WINNER" to "Fastest" or simply "1.0x"
-    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
+    // Start the table with clean headers
+    let html = `<table class="comp-table">
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>Total Steps</th>
+                        <th>Ratio</th>
+                    </tr>`;
+
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
+        
+        // Clean rows: No trophies, just data
         html += `<tr class="${a === winner ? 'row-winner' : ''}">
                     <td>${a.toUpperCase()}</td>
-                    <td>${engines[a].frames.length}</td>
+                    <td>${engines[a].frames.length.toLocaleString()}</td>
                     <td>${a === winner ? 'Optimal' : gap + 'x'}</td>
                  </tr>`;
     });
+
     html += `</table>`;
     
-    // Updated insight text to be more clinical
-    html += `<div class="insight-text"><b>Analysis:</b> ${winner.toUpperCase()} achieved the target state with the lowest computational overhead in this scenario.</div>`;
+    // Clinical Analysis text
+    html += `<div class="insight-text">
+                <b>Analysis:</b> ${winner.toUpperCase()} achieved the target state with the lowest computational overhead in this scenario.
+             </div>`;
     
     details.innerHTML = html;
 }
-
 function setN(n) { currentN = n; genScenario('avg'); }
 document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); };
 document.getElementById('resetBtn').onclick = () => genScenario('avg');
