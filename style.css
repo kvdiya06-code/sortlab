@@ -90,11 +90,10 @@ body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidd
 
 .bar { 
     background: var(--bar-default); 
-    flex: 1;            /* This forces them to share the space inside the box */
-    max-width: 30px;    /* This prevents them from being too wide */
-    min-width: 1px;     /* This ensures they don't disappear */
+    flex: 1 1 auto;      /* The '1' in the middle allows it to shrink to fit */
+    max-width: 30px;    
+    min-width: 1px;      /* Allows bars to become very thin at size 85 */
     border-radius: 2px 2px 0 0;
-    transition: height 0.2s ease;
 }
 /* Analysis Overlay */
 .comp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 100; }
