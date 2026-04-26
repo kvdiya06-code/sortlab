@@ -41,17 +41,18 @@
             </div>
 
             <div class="section">
+                <label>CUSTOM DATA</label>
+                <div class="input-stack">
+                    <input type="text" id="customInput" placeholder="e.g. 10, 40, 20, 50">
+                    <button onclick="setCustomData()" class="apply-btn">Apply Sequence</button>
+                </div>
+            </div>
+
+            <div class="section">
                 <label>ANIMATION SPEED</label>
                 <input type="range" id="speed" min="1" max="200" value="180">
             </div>
         </aside>
-        <div class="section">
-    <label>CUSTOM DATA</label>
-    <div class="input-group">
-        <input type="text" id="customInput" placeholder="e.g. 5, 20, 15, 80, 44">
-        <button onclick="setCustomData()" class="sec-btn" style="margin-top: 5px; width: 100%;">Apply Data</button>
-    </div>
-</div>
 
         <main class="viewport">
             <header class="header">
@@ -59,22 +60,20 @@
                 <div class="actions">
                     <button id="resetBtn" class="sec-btn">Reset</button>
                     <button id="playBtn" class="pri-btn">Run Benchmark</button>
-
                 </div>
             </header>
 
             <div id="matrixGrid" class="matrix-grid"></div>
-            <div id="comparisonOverlay" class="comp-overlay">
-    <div class="comp-content">
-        <h2>Benchmark Analysis</h2>
-        <div id="comparisonDetails"></div>
-        <button onclick="document.getElementById('comparisonOverlay').style.display='none'" class="pri-btn">Close Analysis</button>
-    </div>
-</div>
         </main>
     </div>
 
-    <div id="winnerToast" class="winner-toast"></div>
+    <div id="comparisonOverlay" class="comp-overlay">
+        <div class="comp-content">
+            <h2>Benchmark Analysis</h2>
+            <div id="comparisonDetails"></div>
+            <button onclick="document.getElementById('comparisonOverlay').style.display='none'" class="pri-btn">Close Analysis</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
