@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORTLAB | Performance Matrix</title>
+    <title>SORTLAB | Fluid Matrix</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
             <div class="brand">SORT<span>LAB</span></div>
             
             <div class="section">
-                <label>ALGORITHMS</label>
+                <label>ALGORITHMS (MAX 5)</label>
                 <div class="checklist">
                     <label class="item"><input type="checkbox" value="quick" checked> <span>Quick Sort</span></label>
                     <label class="item"><input type="checkbox" value="merge" checked> <span>Merge Sort</span></label>
@@ -25,9 +25,9 @@
             <div class="section">
                 <label>SCENARIO</label>
                 <div class="btn-stack">
-                    <button onclick="genScenario('best')" class="scen-btn">Best Case (Sorted)</button>
-                    <button onclick="genScenario('avg')" class="scen-btn active">Average (Random)</button>
-                    <button onclick="genScenario('worst')" class="scen-btn">Worst Case (Reverse)</button>
+                    <button onclick="genScenario('best')" class="scen-btn">Best Case</button>
+                    <button onclick="genScenario('avg')" class="scen-btn active">Average</button>
+                    <button onclick="genScenario('worst')" class="scen-btn">Worst Case</button>
                 </div>
             </div>
 
@@ -56,7 +56,7 @@
 
         <main class="viewport">
             <header class="header">
-                <div id="status">Analyze efficiency in real-time</div>
+                <div id="status">Dynamic Performance Analysis</div>
                 <div class="actions">
                     <div class="step-controls">
                         <button onclick="stepBack()" class="icon-btn">Back</button>
