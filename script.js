@@ -1,3 +1,7 @@
+/** * SORTLAB | Performance Matrix
+ * Core Logic & Animation Engine
+ */
+
 let masterArr = [];
 let engines = {};
 let isPlaying = false;
@@ -81,13 +85,16 @@ const Algos = {
     }
 };
 
+// Scenario Logic
 function genScenario(type) {
     document.querySelectorAll('.scen-btn').forEach(b => b.classList.remove('active'));
-    if(event) event.target.classList.add('active');
+    if(event && event.target.classList) event.target.classList.add('active');
+    
     let arr = [];
     if (type === 'best') arr = Array.from({length: currentN}, (_, i) => i + 5);
     else if (type === 'worst') arr = Array.from({length: currentN}, (_, i) => (currentN - i) + 5);
     else arr = Array.from({length: currentN}, () => Math.floor(Math.random() * 100) + 5);
+    
     masterArr = arr;
     resetBenchmark();
 }
@@ -96,12 +103,18 @@ function setCustomData() {
     const val = document.getElementById('customInput').value;
     if (!val) return;
     const arr = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-    if (arr.length > 0) { masterArr = arr; currentN = arr.length; resetBenchmark(); }
+    if (arr.length > 0) { 
+        masterArr = arr; 
+        currentN = arr.length; 
+        resetBenchmark(); 
+    }
 }
 
+// Playback Controls
 function togglePause() {
     isPlaying = !isPlaying;
-    document.getElementById('pauseBtn').innerText = isPlaying ? "Pause" : "Resume";
+    const btn = document.getElementById('pauseBtn');
+    if (btn) btn.innerText = isPlaying ? "Pause" : "Resume";
     if (isPlaying) loop();
 }
 
@@ -109,7 +122,10 @@ function stepForward() {
     isPlaying = false;
     document.getElementById('pauseBtn').innerText = "Resume";
     Object.keys(engines).forEach(a => {
-        if (engines[a].idx < engines[a].frames.length - 1) { engines[a].idx++; render(a, engines[a].idx); }
+        if (engines[a].idx < engines[a].frames.length - 1) { 
+            engines[a].idx++; 
+            render(a, engines[a].idx); 
+        }
     });
 }
 
@@ -117,18 +133,25 @@ function stepBack() {
     isPlaying = false;
     document.getElementById('pauseBtn').innerText = "Resume";
     Object.keys(engines).forEach(a => {
-        if (engines[a].idx > 0) { engines[a].idx--; render(a, engines[a].idx); }
+        if (engines[a].idx > 0) { 
+            engines[a].idx--; 
+            render(a, engines[a].idx); 
+        }
     });
 }
 
+// UI Management
 function resetBenchmark() {
-    isPlaying = false; clearTimeout(clock);
+    isPlaying = false; 
+    clearTimeout(clock);
     document.getElementById('comparisonOverlay').style.display = 'none';
     document.getElementById('pauseBtn').innerText = "Pause";
+    
     const grid = document.getElementById('matrixGrid');
     const selected = Array.from(document.querySelectorAll('.checklist input:checked')).map(i => i.value);
     
-    grid.innerHTML = ''; engines = {};
+    grid.innerHTML = ''; 
+    engines = {};
 
     selected.forEach(algo => {
         const panel = document.createElement('div');
@@ -144,11 +167,18 @@ function resetBenchmark() {
             </div>
             <div class="viz" id="viz-${algo}"></div>`;
         grid.appendChild(panel);
+
         engines[algo] = { frames: [], idx: 0, stats: { ops: 0, swaps: 0 } };
         const temp = [...masterArr];
-        const push = (c, s) => engines[algo].frames.push({ data: [...temp], comp: c, swap: s, done: [], stats: {...engines[algo].stats} });
+        const push = (c, s) => engines[algo].frames.push({ 
+            data: [...temp], comp: c, swap: s, done: [], stats: {...engines[algo].stats} 
+        });
+        
         Algos[algo](temp, push, engines[algo].stats);
-        engines[algo].frames.push({ data: [...temp], comp: [], swap: [], done: Array.from(temp.keys()), stats: {...engines[algo].stats} });
+        engines[algo].frames.push({ 
+            data: [...temp], comp: [], swap: [], done: Array.from(temp.keys()), stats: {...engines[algo].stats} 
+        });
+        
         render(algo, 0);
     });
 }
@@ -156,8 +186,8 @@ function resetBenchmark() {
 function render(algo, fIdx) {
     const f = engines[algo].frames[fIdx];
     const box = document.getElementById(`viz-${algo}`);
-    if (!box) return;
-    
+    if (!box) return; 
+
     const max = Math.max(...masterArr);
     box.innerHTML = '';
 
@@ -165,12 +195,14 @@ function render(algo, fIdx) {
         const b = document.createElement('div');
         b.className = 'bar';
         b.style.height = `${(v / max) * 100}%`;
+        
         if (f.swap.includes(i)) b.style.backgroundColor = 'var(--swap)';
         else if (f.comp.includes(i)) b.style.backgroundColor = 'var(--compare)';
         else if (f.done.includes(i)) b.style.backgroundColor = 'var(--done)';
+        
         box.appendChild(b);
     });
-    
+
     const ops = document.getElementById(`ops-${algo}`);
     const swp = document.getElementById(`swaps-${algo}`);
     if(ops) ops.innerText = f.stats.ops;
@@ -179,12 +211,23 @@ function render(algo, fIdx) {
 
 function loop() {
     if (!isPlaying) return;
-    let fin = 0;
-    Object.keys(engines).forEach(a => {
-        if (engines[a].idx < engines[a].frames.length - 1) { engines[a].idx++; render(a, engines[a].idx); }
-        else fin++;
+    let finishedCount = 0;
+    const activeAlgos = Object.keys(engines);
+    
+    activeAlgos.forEach(a => {
+        if (engines[a].idx < engines[a].frames.length - 1) { 
+            engines[a].idx++; 
+            render(a, engines[a].idx); 
+        } else {
+            finishedCount++;
+        }
     });
-    if (fin === Object.keys(engines).length && Object.keys(engines).length > 0) { isPlaying = false; showAnalysis(); return; }
+
+    if (finishedCount === activeAlgos.length && activeAlgos.length > 0) { 
+        isPlaying = false; 
+        showAnalysis(); 
+        return; 
+    }
     clock = setTimeout(loop, 201 - document.getElementById('speed').value);
 }
 
@@ -192,18 +235,33 @@ function showAnalysis() {
     const ranked = Object.keys(engines).sort((a, b) => engines[a].frames.length - engines[b].frames.length);
     const winner = ranked[0];
     const details = document.getElementById('comparisonDetails');
+    
     document.getElementById('comparisonOverlay').style.display = 'flex';
-    let html = `<table class="comp-table"><tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
+
+    let html = `<table class="comp-table">
+                    <tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
+
     ranked.forEach(a => {
         const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
-        html += `<tr class="${a === winner ? 'row-winner' : ''}"><td>${a.toUpperCase()}</td><td>${engines[a].frames.length}</td><td>${a === winner ? 'Optimal' : gap + 'x'}</td></tr>`;
+        html += `<tr class="${a === winner ? 'row-winner' : ''}">
+                    <td>${a.toUpperCase()}</td>
+                    <td>${engines[a].frames.length.toLocaleString()}</td>
+                    <td>${a === winner ? 'Optimal' : gap + 'x'}</td>
+                 </tr>`;
     });
+
     html += `</table>`;
+    html += `<div class="insight-text"><b>Analysis:</b> ${winner.toUpperCase()} achieved the target state with the lowest computational overhead in this scenario.</div>`;
+    
     details.innerHTML = html;
 }
 
+// Initializers
 function setN(n) { currentN = n; genScenario('avg'); }
+
 document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); };
 document.getElementById('resetBtn').onclick = () => genScenario('avg');
 document.querySelectorAll('.checklist input').forEach(i => i.onchange = () => resetBenchmark());
+
+// Startup
 genScenario('avg');
