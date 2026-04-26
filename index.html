@@ -58,9 +58,14 @@
             <header class="header">
                 <div id="status">Select scenarios to compare performance</div>
                 <div class="actions">
-                    <button id="resetBtn" class="sec-btn">Reset</button>
-                    <button id="playBtn" class="pri-btn">Run Benchmark</button>
-                </div>
+    <div class="step-controls">
+        <button onclick="stepBack()" class="icon-btn" title="Previous Step">Step Back</button>
+        <button id="pauseBtn" onclick="togglePause()" class="icon-btn">Pause</button>
+        <button onclick="stepForward()" class="icon-btn" title="Next Step">Step Forward</button>
+    </div>
+    <button id="resetBtn" class="sec-btn">Reset</button>
+    <button id="playBtn" class="pri-btn">Run Benchmark</button>
+</div>
             </header>
 
             <div id="matrixGrid" class="matrix-grid"></div>
