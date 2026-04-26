@@ -90,11 +90,12 @@ body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidd
 
 .bar { 
     background: var(--bar-default); 
-    width: 100%; 
-    max-width: 30px;       /* This keeps bars thin and professional */
-    min-width: 2px;
+    flex: 1;            /* This forces them to share the space inside the box */
+    max-width: 30px;    /* This prevents them from being too wide */
+    min-width: 1px;     /* This ensures they don't disappear */
+    border-radius: 2px 2px 0 0;
+    transition: height 0.2s ease;
 }
-
 /* Analysis Overlay */
 .comp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 100; }
 .comp-content { background: var(--side); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--border); width: 90%; max-width: 500px; }
