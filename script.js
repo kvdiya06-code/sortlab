@@ -1,267 +1,105 @@
-/** * SORTLAB | Performance Matrix
- * Core Logic & Animation Engine
- */
-
-let masterArr = [];
-let engines = {};
-let isPlaying = false;
-let clock = null;
-let currentN = 50;
-
-const Metadata = {
-    quick: { t: 'O(n log n)', worst: 'O(n²)' },
-    merge: { t: 'O(n log n)', worst: 'O(n log n)' },
-    insertion: { t: 'O(n²)', worst: 'O(n²)' },
-    selection: { t: 'O(n²)', worst: 'O(n²)' },
-    bubble: { t: 'O(n²)', worst: 'O(n²)' }
-};
-
-const Algos = {
-    bubble: (arr, push, stats) => {
-        for (let i = 0; i < arr.length; i++) {
-            for (let j = 0; j < arr.length - i - 1; j++) {
-                stats.ops++;
-                if (arr[j] > arr[j + 1]) {
-                    [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                    stats.swaps++; push([], [j, j + 1]);
-                } else push([j, j + 1], []);
-            }
-        }
-    },
-    selection: (arr, push, stats) => {
-        for (let i = 0; i < arr.length; i++) {
-            let m = i;
-            for (let j = i + 1; j < arr.length; j++) {
-                stats.ops++; push([j, m], []);
-                if (arr[j] < arr[m]) m = j;
-            }
-            [arr[i], arr[m]] = [arr[m], arr[i]]; stats.swaps++; push([], [i, m]);
-        }
-    },
-    insertion: (arr, push, stats) => {
-        for (let i = 1; i < arr.length; i++) {
-            let k = arr[i], j = i - 1;
-            while (j >= 0 && arr[j] > k) {
-                stats.ops++; arr[j + 1] = arr[j]; stats.swaps++;
-                push([j], [j, j + 1]); j--;
-            }
-            arr[j + 1] = k; push([], [j + 1]);
-        }
-    },
-    quick: (arr, push, stats) => {
-        const sort = (l, h) => {
-            if (l < h) {
-                let p = arr[h], i = l;
-                for (let j = l; j < h; j++) {
-                    stats.ops++; push([j, h], []);
-                    if (arr[j] < p) {
-                        [arr[i], arr[j]] = [arr[j], arr[i]];
-                        stats.swaps++; push([], [i, j]); i++;
-                    }
-                }
-                [arr[i], arr[h]] = [arr[h], arr[i]]; stats.swaps++; push([], [i, h]);
-                sort(l, i - 1); sort(i + 1, h);
-            }
-        };
-        sort(0, arr.length - 1);
-    },
-    merge: (arr, push, stats) => {
-        const mSort = (start, end) => {
-            if (end - start <= 1) return;
-            let mid = Math.floor((start + end) / 2);
-            mSort(start, mid); mSort(mid, end);
-            let left = arr.slice(start, mid), right = arr.slice(mid, end);
-            let i = 0, j = 0, k = start;
-            while (i < left.length && j < right.length) {
-                stats.ops++;
-                if (left[i] <= right[j]) arr[k] = left[i++];
-                else arr[k] = right[j++];
-                stats.swaps++; push([k], [k]); k++;
-            }
-            while (i < left.length) arr[k++] = left[i++];
-            while (j < right.length) arr[k++] = right[j++];
-        };
-        mSort(0, arr.length);
-    }
-};
-
-// Scenario Logic
-function genScenario(type) {
-    document.querySelectorAll('.scen-btn').forEach(b => b.classList.remove('active'));
-    if(event && event.target.classList) event.target.classList.add('active');
-    
-    let arr = [];
-    if (type === 'best') arr = Array.from({length: currentN}, (_, i) => i + 5);
-    else if (type === 'worst') arr = Array.from({length: currentN}, (_, i) => (currentN - i) + 5);
-    else arr = Array.from({length: currentN}, () => Math.floor(Math.random() * 100) + 5);
-    
-    masterArr = arr;
-    resetBenchmark();
+:root {
+    --bg: #030303;
+    --side: #0a0a0a;
+    --card: #111111;
+    --border: #1a1a1a;
+    --accent: #3291ff;
+    --text-dim: #555;
+    --white: #eaeaea;
+    --compare: #7928ca;
+    --swap: #ff0080;
+    --done: #00dfd8;
+    --bar-default: #333;
 }
 
-function setCustomData() {
-    const val = document.getElementById('customInput').value;
-    if (!val) return;
-    const arr = val.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
-    if (arr.length > 0) { 
-        masterArr = arr; 
-        currentN = arr.length; 
-        resetBenchmark(); 
-    }
+* { box-sizing: border-box; margin: 0; font-family: 'Inter', sans-serif; }
+body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidden; }
+
+.app-shell { display: flex; height: 100vh; }
+
+.sidebar { width: 260px; background: var(--side); border-right: 1px solid var(--border); padding: 1.5rem; overflow-y: auto; }
+.brand { font-weight: 900; font-size: 1.2rem; margin-bottom: 2rem; color: #fff; }
+.brand span { color: var(--text-dim); }
+
+.section { margin-bottom: 1.5rem; }
+.section label { display: block; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 10px; text-transform: uppercase; }
+
+.btn-stack, .input-stack, .checklist { display: flex; flex-direction: column; gap: 6px; }
+.scen-btn, .size-btns button, .sec-btn, .apply-btn, .icon-btn { 
+    background: transparent; border: 1px solid var(--border); color: #fff;
+    padding: 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: 0.2s;
+}
+.item { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.scen-btn.active { border-color: var(--accent); background: rgba(50, 145, 255, 0.1); }
+.apply-btn { color: var(--accent); font-weight: bold; text-align: center; }
+
+#customInput { background: #000; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.75rem; outline: none; }
+.size-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+
+/* DYNAMIC FLEX GRID */
+.matrix-grid { 
+    flex: 1; 
+    display: flex; 
+    flex-wrap: wrap; 
+    align-content: center; 
+    justify-content: center; 
+    gap: 20px; 
+    padding: 40px;
+    overflow-y: auto;
 }
 
-// Playback Controls
-function togglePause() {
-    isPlaying = !isPlaying;
-    const btn = document.getElementById('pauseBtn');
-    if (btn) btn.innerText = isPlaying ? "Pause" : "Resume";
-    if (isPlaying) loop();
+.engine-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    width: 350px; 
+    height: 380px;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
 }
 
-function stepForward() {
-    isPlaying = false;
-    document.getElementById('pauseBtn').innerText = "Resume";
-    Object.keys(engines).forEach(a => {
-        if (engines[a].idx < engines[a].frames.length - 1) { 
-            engines[a].idx++; 
-            render(a, engines[a].idx); 
-        }
-    });
+.engine-panel:only-child {
+    width: 600px;
+    height: 500px;
 }
 
-function stepBack() {
-    isPlaying = false;
-    document.getElementById('pauseBtn').innerText = "Resume";
-    Object.keys(engines).forEach(a => {
-        if (engines[a].idx > 0) { 
-            engines[a].idx--; 
-            render(a, engines[a].idx); 
-        }
-    });
+.viewport { flex: 1; display: flex; flex-direction: column; }
+.header { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; }
+.actions { display: flex; align-items: center; gap: 12px; }
+.pri-btn { background: #fff; color: #000; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+.step-controls { display: flex; gap: 4px; background: #000; padding: 4px; border-radius: 8px; border: 1px solid var(--border); }
+
+.panel-info { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+.algo-title { font-weight: 800; text-transform: uppercase; font-size: 0.9rem; color: var(--accent); }
+.comp-badge { font-size: 0.6rem; color: var(--done); border: 1px solid var(--done); padding: 2px 6px; border-radius: 4px; }
+
+.metrics { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.m-card { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; }
+.m-card b { display: block; font-size: 1.1rem; color: #fff; }
+
+/* BAR STYLING */
+.viz { 
+    flex: 1; 
+    display: flex; 
+    align-items: flex-end; 
+    justify-content: center; /* Centers thin arrays */
+    gap: 4px; 
+    padding-bottom: 10px;
 }
 
-// UI Management
-function resetBenchmark() {
-    isPlaying = false; 
-    clearTimeout(clock);
-    document.getElementById('comparisonOverlay').style.display = 'none';
-    document.getElementById('pauseBtn').innerText = "Pause";
-    
-    const grid = document.getElementById('matrixGrid');
-    const selected = Array.from(document.querySelectorAll('.checklist input:checked')).map(i => i.value);
-    
-    grid.innerHTML = ''; 
-    engines = {};
-
-    selected.forEach(algo => {
-        const panel = document.createElement('div');
-        panel.className = 'engine-panel';
-        panel.innerHTML = `
-            <div class="panel-info">
-                <div class="algo-title">${algo}</div>
-                <div class="comp-badge">${Metadata[algo].t}</div>
-            </div>
-            <div class="metrics">
-                <div class="m-card">Steps <b id="ops-${algo}">0</b></div>
-                <div class="m-card">Swaps <b id="swaps-${algo}">0</b></div>
-            </div>
-            <div class="viz" id="viz-${algo}"></div>`;
-        grid.appendChild(panel);
-
-        engines[algo] = { frames: [], idx: 0, stats: { ops: 0, swaps: 0 } };
-        const temp = [...masterArr];
-        const push = (c, s) => engines[algo].frames.push({ 
-            data: [...temp], comp: c, swap: s, done: [], stats: {...engines[algo].stats} 
-        });
-        
-        Algos[algo](temp, push, engines[algo].stats);
-        engines[algo].frames.push({ 
-            data: [...temp], comp: [], swap: [], done: Array.from(temp.keys()), stats: {...engines[algo].stats} 
-        });
-        
-        render(algo, 0);
-    });
+.bar { 
+    background: var(--bar-default); 
+    width: 100%; 
+    max-width: 30px; /* Prevents bars from becoming huge blocks */
+    min-width: 2px;
+    border-radius: 2px 2px 0 0; 
 }
 
-function render(algo, fIdx) {
-    const f = engines[algo].frames[fIdx];
-    const box = document.getElementById(`viz-${algo}`);
-    if (!box) return; 
-
-    const max = Math.max(...masterArr);
-    box.innerHTML = '';
-
-    f.data.forEach((v, i) => {
-        const b = document.createElement('div');
-        b.className = 'bar';
-        b.style.height = `${(v / max) * 100}%`;
-        
-        if (f.swap.includes(i)) b.style.backgroundColor = 'var(--swap)';
-        else if (f.comp.includes(i)) b.style.backgroundColor = 'var(--compare)';
-        else if (f.done.includes(i)) b.style.backgroundColor = 'var(--done)';
-        
-        box.appendChild(b);
-    });
-
-    const ops = document.getElementById(`ops-${algo}`);
-    const swp = document.getElementById(`swaps-${algo}`);
-    if(ops) ops.innerText = f.stats.ops;
-    if(swp) swp.innerText = f.stats.swaps;
-}
-
-function loop() {
-    if (!isPlaying) return;
-    let finishedCount = 0;
-    const activeAlgos = Object.keys(engines);
-    
-    activeAlgos.forEach(a => {
-        if (engines[a].idx < engines[a].frames.length - 1) { 
-            engines[a].idx++; 
-            render(a, engines[a].idx); 
-        } else {
-            finishedCount++;
-        }
-    });
-
-    if (finishedCount === activeAlgos.length && activeAlgos.length > 0) { 
-        isPlaying = false; 
-        showAnalysis(); 
-        return; 
-    }
-    clock = setTimeout(loop, 201 - document.getElementById('speed').value);
-}
-
-function showAnalysis() {
-    const ranked = Object.keys(engines).sort((a, b) => engines[a].frames.length - engines[b].frames.length);
-    const winner = ranked[0];
-    const details = document.getElementById('comparisonDetails');
-    
-    document.getElementById('comparisonOverlay').style.display = 'flex';
-
-    let html = `<table class="comp-table">
-                    <tr><th>Algorithm</th><th>Steps</th><th>Ratio</th></tr>`;
-
-    ranked.forEach(a => {
-        const gap = (engines[a].frames.length / engines[winner].frames.length).toFixed(1);
-        html += `<tr class="${a === winner ? 'row-winner' : ''}">
-                    <td>${a.toUpperCase()}</td>
-                    <td>${engines[a].frames.length.toLocaleString()}</td>
-                    <td>${a === winner ? 'Optimal' : gap + 'x'}</td>
-                 </tr>`;
-    });
-
-    html += `</table>`;
-    html += `<div class="insight-text"><b>Analysis:</b> ${winner.toUpperCase()} achieved the target state with the lowest computational overhead in this scenario.</div>`;
-    
-    details.innerHTML = html;
-}
-
-// Initializers
-function setN(n) { currentN = n; genScenario('avg'); }
-
-document.getElementById('playBtn').onclick = () => { isPlaying = true; loop(); };
-document.getElementById('resetBtn').onclick = () => genScenario('avg');
-document.querySelectorAll('.checklist input').forEach(i => i.onchange = () => resetBenchmark());
-
-// Startup
-genScenario('avg');
+/* Analysis Overlay */
+.comp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 100; }
+.comp-content { background: var(--side); padding: 2.5rem; border-radius: 16px; border: 1px solid var(--border); width: 90%; max-width: 500px; }
+.comp-table { width: 100%; margin: 1.5rem 0; border-collapse: collapse; }
+.comp-table th, .comp-table td { padding: 12px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.9rem; }
+.row-winner { background: rgba(0, 223, 216, 0.05); color: var(--done); font-weight: bold; }
