@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SORTLAB | Educational Matrix</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">SORT<span>LAB</span></div>
+            
+            <div class="section">
+                <label>ALGORITHMS</label>
+                <div class="checklist">
+                    <label class="item"><input type="checkbox" value="quick" checked> <span>Quick Sort</span></label>
+                    <label class="item"><input type="checkbox" value="merge" checked> <span>Merge Sort</span></label>
+                    <label class="item"><input type="checkbox" value="insertion" checked> <span>Insertion Sort</span></label>
+                    <label class="item"><input type="checkbox" value="selection"> <span>Selection Sort</span></label>
+                    <label class="item"><input type="checkbox" value="bubble"> <span>Bubble Sort</span></label>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>SCENARIO GENERATOR</label>
+                <div class="btn-stack">
+                    <button onclick="genScenario('best')" class="scen-btn">Best Case (Sorted)</button>
+                    <button onclick="genScenario('avg')" class="scen-btn active">Average (Random)</button>
+                    <button onclick="genScenario('worst')" class="scen-btn">Worst Case (Reverse)</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>ARRAY SIZE</label>
+                <div class="size-btns">
+                    <button onclick="setN(20)">20</button>
+                    <button onclick="setN(50)">50</button>
+                    <button onclick="setN(100)">100</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>ANIMATION SPEED</label>
+                <input type="range" id="speed" min="1" max="200" value="180">
+            </div>
+        </aside>
+        <div class="section">
+    <label>CUSTOM DATA</label>
+    <div class="input-group">
+        <input type="text" id="customInput" placeholder="e.g. 5, 20, 15, 80, 44">
+        <button onclick="setCustomData()" class="sec-btn" style="margin-top: 5px; width: 100%;">Apply Data</button>
+    </div>
+</div>
+
+        <main class="viewport">
+            <header class="header">
+                <div id="status">Select scenarios to compare performance</div>
+                <div class="actions">
+                    <button id="resetBtn" class="sec-btn">Reset</button>
+                    <button id="playBtn" class="pri-btn">Run Benchmark</button>
+
+                </div>
+            </header>
+
+            <div id="matrixGrid" class="matrix-grid"></div>
+            <div id="comparisonOverlay" class="comp-overlay">
+    <div class="comp-content">
+        <h2>Benchmark Analysis</h2>
+        <div id="comparisonDetails"></div>
+        <button onclick="document.getElementById('comparisonOverlay').style.display='none'" class="pri-btn">Close Analysis</button>
+    </div>
+</div>
+        </main>
+    </div>
+
+    <div id="winnerToast" class="winner-toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+:root {
+    /* Base UI Colors (Deep Space Black/Gray) */
+    --bg: #030303;           /* Pitch black background */
+    --side: #0a0a0a;         /* Slightly lighter sidebar */
+    --card: #111111;         /* Slightly lighter grid cells */
+    --border: #1a1a1a;       /* Subdued border color */
+    
+    /* Secondary Accent (Subtle Interface Blue) */
+    --accent: #3291ff;       /* A vibrant, electric cyan-blue */
+    
+    /* Text & Dim States */
+    --text-dim: #555555;     /* Very dim, readable against dark bg */
+    --white: #eaeaea;        /* Off-white (less harsh on eyes) */
+
+    /* --- THE VISUALIZATION PALETTE --- */
+    
+    /* Default/Inactive Bar Color */
+    --bar-default: #333333; /* Dark gray, recedes into background */
+
+    /* When algorithms are comparing two elements */
+    --compare: #7928ca;     /* Royal, deep purple (High energy but non-alarming) */
+
+    /* When algorithms are actually swapping/overwriting elements */
+    --swap: #ff0080;        /* Hot pink/magenta (Highest energy, immediate attention) */
+
+    /* When an element is in its final, sorted position */
+    --done: #00dfd8;        /* Bright Teal (A calm, finalized "OK" state) */
+}
+
+* { box-sizing: border-box; margin: 0; font-family: 'Inter', sans-serif; }
+body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidden; }
+
+.app-shell { display: flex; height: 100vh; }
+
+/* Sidebar Styling */
+.sidebar { width: 280px; background: var(--side); border-right: 1px solid var(--border); padding: 2rem; }
+.brand { font-weight: 900; font-size: 1.4rem; margin-bottom: 2rem; }
+.brand span { color: var(--text-dim); font-weight: 300; }
+
+.section { margin-bottom: 1.5rem; }
+.section label { display: block; font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 12px; }
+
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: #aaa; cursor: pointer; }
+.item input { accent-color: var(--accent); }
+
+.btn-stack { display: flex; flex-direction: column; gap: 6px; }
+.scen-btn, .size-btns button, .sec-btn { 
+    background: transparent; border: 1px solid var(--border); color: #fff;
+    padding: 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; text-align: left;
+}
+.scen-btn:hover, .size-btns button:hover { background: #1a1a1a; }
+.scen-btn.active { border-color: var(--accent); background: rgba(0, 112, 243, 0.1); }
+
+.size-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; }
+
+/* Main Content */
+.viewport { flex: 1; display: flex; flex-direction: column; }
+.header { height: 70px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; }
+.pri-btn { background: #fff; color: #000; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+
+/* Grid Logic */
+.matrix-grid { flex: 1; display: grid; background: var(--border); gap: 1px; }
+.engine-panel { background: var(--bg); display: flex; flex-direction: column; padding: 1.5rem; }
+
+.panel-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.algo-title { font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--accent); }
+.comp-badge {
+    font-size: 0.75rem;
+    font-family: 'JetBrains Mono', monospace; /* Looks more "coder" */
+    color: var(--accent); /* Uses that bright blue/purple we set earlier */
+    background: rgba(50, 145, 255, 0.1); /* Very faint background tint */
+    border: 1px solid rgba(50, 145, 255, 0.3);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.metrics { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
+.m-card { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; }
+.m-card b { display: block; font-size: 1.1rem; color: #fff; }
+
+.viz { flex: 1; display: flex; align-items: flex-end; gap: 2px; }
+.bar { 
+    background: var(--bar-default); /* Changed from #222 */
+    width: 100%; 
+    border-radius: 2px 2px 0 0; 
+}
+
+.winner-toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white; padding: 12px 30px; border-radius: 50px;
+    font-weight: 600; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+/* --- BENCHMARK ANALYSIS OVERLAY --- */
+.comp-overlay {
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100vw; 
+    height: 100vh;
+    background: rgba(3, 3, 3, 0.9); /* Matches your --bg */
+    backdrop-filter: blur(12px);    /* Modern frosted glass effect */
+    display: none;                  /* Hidden by default */
+    justify-content: center; 
+    align-items: center; 
+    z-index: 9999;                  /* Sits on top of everything */
+}
+
+.comp-content {
+    background: var(--side); 
+    border: 1px solid var(--border);
+    padding: 3rem; 
+    border-radius: 16px; 
+    max-width: 550px; 
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 0 50px rgba(0,0,0,1);
+}
+
+.comp-content h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.5px;
+}
+
+.comp-table {
+    width: 100%; 
+    margin: 2rem 0; 
+    border-collapse: collapse;
+}
+
+.comp-table th { 
+    padding: 12px; 
+    color: var(--text-dim); 
+    text-transform: uppercase; 
+    font-size: 0.65rem; 
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border); 
+}
+
+.comp-table td { 
+    padding: 14px; 
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--border); 
+}
+
+/* Highlights the winner in your table */
+.row-winner { 
+    color: var(--done); 
+    font-weight: 800; 
+    background: rgba(0, 223, 216, 0.05); 
+}
+
+.insight-text { 
+    font-size: 0.85rem; 
+    color: #888; 
+    line-height: 1.6; 
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #000;
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+    text-align: left;
+}
+.input-group input {
+    width: 100%;
+    background: #000;
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--accent);
+}
