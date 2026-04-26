@@ -40,12 +40,12 @@ body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidd
 .matrix-grid { 
     flex: 1; 
     display: flex; 
-    flex-wrap: wrap; 
+    flex-wrap: wrap;       /* This prevents horizontal overlapping */
     align-content: center; 
     justify-content: center; 
     gap: 20px; 
     padding: 40px;
-    overflow-y: auto;
+    overflow: hidden;      /* Prevents bars from leaking out */
 }
 
 .engine-panel {
@@ -54,10 +54,10 @@ body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidd
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
-    width: 350px; 
+    width: 350px;          /* Standard width to prevent overlap */
     height: 380px;
     border-radius: 12px;
-    transition: transform 0.3s ease;
+    position: relative;    /* Keeps children contained */
 }
 
 .engine-panel:only-child {
@@ -84,17 +84,15 @@ body { background: var(--bg); color: var(--white); height: 100vh; overflow: hidd
     flex: 1; 
     display: flex; 
     align-items: flex-end; 
-    justify-content: center; /* Centers thin arrays */
-    gap: 4px; 
-    padding-bottom: 10px;
+    justify-content: center; 
+    gap: 2px;              /* Small gap prevents bars from touching */
 }
 
 .bar { 
     background: var(--bar-default); 
     width: 100%; 
-    max-width: 30px; /* Prevents bars from becoming huge blocks */
+    max-width: 30px;       /* This keeps bars thin and professional */
     min-width: 2px;
-    border-radius: 2px 2px 0 0; 
 }
 
 /* Analysis Overlay */
