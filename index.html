@@ -3,82 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SORTLAB | Fluid Matrix</title>
+    <title>SORTLAB | Learn sorting algorithms visually</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-mode="learn">
     <div class="app-shell">
         <aside class="sidebar">
             <div class="brand">SORT<span>LAB</span></div>
-            
+
             <div class="section">
-                <label>ALGORITHMS (MAX 5)</label>
-                <div class="checklist">
-                    <label class="item"><input type="checkbox" value="quick" checked> <span>Quick Sort</span></label>
-                    <label class="item"><input type="checkbox" value="merge" checked> <span>Merge Sort</span></label>
-                    <label class="item"><input type="checkbox" value="insertion" checked> <span>Insertion Sort</span></label>
-                    <label class="item"><input type="checkbox" value="selection"> <span>Selection Sort</span></label>
-                    <label class="item"><input type="checkbox" value="bubble"> <span>Bubble Sort</span></label>
+                <label>Mode</label>
+                <div class="seg" id="modeSeg">
+                    <button data-mode="learn" class="on">Learn</button>
+                    <button data-mode="race">Race</button>
+                    <button data-mode="scaling">Scale</button>
                 </div>
+                <p class="hint" id="modeHint"></p>
             </div>
 
             <div class="section">
-                <label>SCENARIO</label>
-                <div class="btn-stack">
-                    <button onclick="genScenario('best')" class="scen-btn">Best Case</button>
-                    <button onclick="genScenario('avg')" class="scen-btn active">Average</button>
-                    <button onclick="genScenario('worst')" class="scen-btn">Worst Case</button>
-                </div>
+                <label id="algoLabel">Algorithm</label>
+                <div class="algo-list" id="algoList"></div>
             </div>
 
             <div class="section">
-                <label>ARRAY SIZE</label>
-                <div class="size-btns">
-                    <button onclick="setN(20)">20</button>
-                    <button onclick="setN(50)">50</button>
-                    <button onclick="setN(85)">85</button>
-                </div>
+                <label>Data pattern</label>
+                <div class="chip-grid" id="scenList"></div>
+                <p class="hint" id="scenHint"></p>
             </div>
 
-            <div class="section">
-                <label>CUSTOM DATA</label>
+            <div class="section sec-size">
+                <label>Array size <b id="nVal">30</b></label>
+                <input type="range" id="sizeRange" min="5" max="85" value="30">
+            </div>
+
+            <div class="section sec-custom">
+                <label>Custom data</label>
                 <div class="input-stack">
-                    <input type="text" id="customInput" placeholder="e.g. 10, 40, 20, 50">
-                    <button onclick="setCustomData()" class="apply-btn">Apply Sequence</button>
+                    <input type="text" id="customInput" placeholder="e.g. 40, 10, 30, 20">
+                    <button id="applyCustom" class="apply-btn">Use these numbers</button>
                 </div>
             </div>
 
-            <div class="section">
-                <label>SPEED</label>
-                <input type="range" id="speed" min="1" max="200" value="180">
+            <div class="section sec-speed">
+                <label>Speed</label>
+                <input type="range" id="speed" min="1" max="100" value="55">
+            </div>
+
+            <div class="section sec-options">
+                <label>Options</label>
+                <label class="toggle"><input type="checkbox" id="labelToggle" checked><span>Show values on bars</span></label>
+                <label class="toggle"><input type="checkbox" id="soundToggle"><span>Sound (pitch = value)</span></label>
+            </div>
+
+            <div class="section sec-keys">
+                <label>Shortcuts</label>
+                <div class="keys">
+                    <span><kbd>Space</kbd> play / pause</span>
+                    <span><kbd>←</kbd> <kbd>→</kbd> step</span>
+                    <span><kbd>R</kbd> restart</span>
+                    <span><kbd>N</kbd> new data</span>
+                </div>
             </div>
         </aside>
 
         <main class="viewport">
             <header class="header">
-                <div id="status">Dynamic Performance Analysis</div>
+                <div class="title-block">
+                    <div id="status" class="status">SortLab</div>
+                </div>
                 <div class="actions">
                     <div class="step-controls">
-                        <button onclick="stepBack()" class="icon-btn">Back</button>
-                        <button id="pauseBtn" onclick="togglePause()" class="icon-btn">Pause</button>
-                        <button onclick="stepForward()" class="icon-btn">Next</button>
+                        <button id="restartBtn" class="icon-btn" title="Restart (R)">⏮</button>
+                        <button id="backBtn" class="icon-btn" title="Step back (←)">◀</button>
+                        <button id="nextBtn" class="icon-btn" title="Step forward (→)">▶|</button>
                     </div>
-                    <button id="resetBtn" class="sec-btn">Reset</button>
-                    <button id="playBtn" class="pri-btn">Run Benchmark</button>
+                    <button id="newDataBtn" class="sec-btn" title="New data (N)">New data</button>
+                    <button id="playBtn" class="pri-btn" title="Play / pause (Space)">▶ Play</button>
                 </div>
             </header>
 
-            <div id="matrixGrid" class="matrix-grid"></div>
+            <div class="transport">
+                <input type="range" id="scrub" min="0" max="0" value="0">
+                <span id="stepLabel" class="step-label">Step 0 / 0</span>
+                <div class="legend">
+                    <span><i class="sw" style="background:var(--compare)"></i>Comparing</span>
+                    <span><i class="sw" style="background:var(--swap)"></i>Swap / write</span>
+                    <span><i class="sw" style="background:var(--pivot)"></i>Pivot / key</span>
+                    <span><i class="sw" style="background:var(--prefix)"></i>Sorted so far</span>
+                    <span><i class="sw" style="background:var(--done)"></i>Final place</span>
+                </div>
+            </div>
+
+            <div class="stage">
+                <div id="matrixGrid" class="matrix-grid"></div>
+
+                <aside class="learn-side" id="learnSide">
+                    <div class="card">
+                        <h3>What's happening</h3>
+                        <div id="explain" class="explain">Press Play or step forward to begin.</div>
+                    </div>
+                    <div class="card">
+                        <h3>Pseudocode</h3>
+                        <div id="pseudo" class="pseudo"></div>
+                    </div>
+                    <div class="card">
+                        <h3 id="learnTitle">About</h3>
+                        <p id="aboutBlurb" class="para"></p>
+                        <h4>How it works</h4>
+                        <ol id="aboutIdea" class="idea"></ol>
+                        <h4>Analogy</h4>
+                        <p id="aboutAnalogy" class="para"></p>
+                        <h4>Complexity</h4>
+                        <table class="mini-table" id="aboutTable"></table>
+                        <h4>Good to know</h4>
+                        <p id="aboutGood" class="para"></p>
+                        <div class="try"><b>Try this:</b> <span id="aboutTry"></span></div>
+                    </div>
+                </aside>
+
+                <section id="scalingView" class="scaling-view">
+                    <div class="scale-head">
+                        <div>
+                            <h2>How does the work grow?</h2>
+                            <p class="para">Each point is the number of operations needed to sort an array of that size. Hover the chart to compare values.</p>
+                        </div>
+                        <div class="scale-controls">
+                            <div class="seg" id="metricSeg">
+                                <button data-metric="cmp" class="on">Comparisons</button>
+                                <button data-metric="wr">Swaps / writes</button>
+                                <button data-metric="all">Total</button>
+                            </div>
+                            <label class="toggle"><input type="checkbox" id="logToggle"><span>Log scale</span></label>
+                        </div>
+                    </div>
+                    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+                    <p id="scaleInsight" class="insight"></p>
+                    <div id="scaleTable"></div>
+                </section>
+            </div>
         </main>
     </div>
 
-    <div id="comparisonOverlay" class="comp-overlay">
+    <div id="comparisonOverlay" class="comp-overlay" role="dialog" aria-label="Race results">
         <div class="comp-content">
-            <h2>Benchmark Analysis</h2>
+            <h2>Race results</h2>
+            <p class="sub" id="resSub"></p>
             <div id="comparisonDetails"></div>
-            <button onclick="document.getElementById('comparisonOverlay').style.display='none'" class="pri-btn">Dismiss</button>
+            <p id="resInsight" class="insight"></p>
+            <div class="row-actions">
+                <button id="resAgain" class="sec-btn">Race again with new data</button>
+                <button id="resClose" class="pri-btn">Close</button>
+            </div>
         </div>
     </div>
+
+    <div id="toast" class="toast"></div>
 
     <script src="script.js"></script>
 </body>
